@@ -1,5 +1,6 @@
 package com.example.newmovieapp
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
@@ -9,9 +10,8 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,17 +21,21 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.newmovieapp.models.Movie
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun movieRow(movie: Movie, onItemClick:(String)->Unit={}){
+fun movieRow(//as function is favorited
+    movie: Movie,movieIsFavorited:(Movie)->Boolean={false}, movieFavorited: (Movie) -> Unit={},
+    movieRemovedFavorites:(Movie)->Unit={}, onItemClick:(String)->Unit={}){
     var infoIsExpanded by remember{ mutableStateOf(false) }
     Surface(){
         Card(modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp).clickable(onClick = {
+            .padding(12.dp)
+            .clickable(onClick = {
                 onItemClick(movie.id)
             }),
             shape = RoundedCornerShape(corner = CornerSize(15.dp)),
@@ -49,8 +53,14 @@ fun movieRow(movie: Movie, onItemClick:(String)->Unit={}){
                         .shadow(3.dp))*/
                 AsyncImage(model=movie.images[0], contentDescription = "The movies title image",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(148.dp).padding(9.dp).clip(
-                    RoundedCornerShape(50)))
+                    modifier = Modifier
+                        .size(148.dp)
+                        .padding(9.dp)
+                        .clip(
+                            RoundedCornerShape(50)
+                        ))
+                val favoritesViewModel:FavoritesViewModel = viewModel()
+                
                 Column(){
                     Text(text="${movie.title}",style= MaterialTheme.typography.h6)
                     Text(text="Director: ${movie.director}",style= MaterialTheme.typography.caption)
@@ -77,9 +87,26 @@ fun movieRow(movie: Movie, onItemClick:(String)->Unit={}){
 
 
                 }
+                favoriteIconButton(isFavorited =movieIsFavorited(movie) ,addToFavorite = {
+                    movieFavorited(movie)
+                },removeFromFavorite = {
+                    movieRemovedFavorites(movie)
+                })
 
 
             }
+        }
+    }
+}
+@Composable
+fun favoriteIconButton(isFavorited:Boolean, addToFavorite:()->Unit={}, removeFromFavorite:()->Unit={}){
+    if(!isFavorited){
+        IconButton(onClick={addToFavorite()}){
+            Icon(Icons.Default.FavoriteBorder,"Favorite this movie")
+        }
+    }else{
+        IconButton(onClick={removeFromFavorite()}){
+            Icon(Icons.Filled.Favorite,"Remove this movie from favorites")
         }
     }
 }
