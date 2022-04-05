@@ -22,7 +22,9 @@ fun DetailScreen(movieId: String?, navController: NavController, favoritesVM: Fa
     if(movie!=null){
         detailAppBar(title = movie.title, onBackButton = {navController.popBackStack()}) {
             Column{
-                movieRow(movie = movie,movieIsFavorited = {false})
+                movieRow(movie, onItemClick = { movieId-> navController.navigate(route="detailscreen/$movieId") }){
+                    favoriteIconButton(isFavorited = favoritesVM.checkIfMovieIsFavorite(movie), addToFavorite = {favoritesVM.addMovie(movie);}, removeFromFavorite = {favoritesVM.removeMovie(movie)})
+                }
                 movieImages(images = movie.images)
             }
         }

@@ -1,5 +1,6 @@
 package com.example.newmovieapp
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -77,9 +78,10 @@ fun scaffoldLayout(favoritesClicked: () -> Unit,content:@Composable() () -> Unit
 fun mainContent(movieList: List<Movie>, navController: NavController, favoritesVM: FavoritesViewModel){
     val movieState = remember{favoritesVM.checkIfMovieIsFavorite(movieList[0])}
     LazyColumn{
-        items(movieList) { movie -> movieRow(movie,movieIsFavorited = {favoritesVM.checkIfMovieIsFavorite(it)}, movieFavorited = { favoritesVM.addMovie(it)}, movieRemovedFavorites = {favoritesVM.removeMovie(it)}){
-            movieId->
-            navController.navigate(route="detailscreen/$movieId")
+        items(movieList) { movie -> movieRow(movie, onItemClick = { movieId-> navController.navigate(route="detailscreen/$movieId") }){
+            favoriteIconButton(isFavorited = favoritesVM.checkIfMovieIsFavorite(movie),
+                addToFavorite = {favoritesVM.addMovie(movie);},
+                removeFromFavorite = {favoritesVM.removeMovie(movie)})
         } }
     }
 }

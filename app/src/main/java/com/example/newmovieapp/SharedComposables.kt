@@ -28,8 +28,7 @@ import com.example.newmovieapp.models.Movie
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun movieRow(//as function is favorited
-    movie: Movie,movieIsFavorited:(Movie)->Boolean={false}, movieFavorited: (Movie) -> Unit={},
-    movieRemovedFavorites:(Movie)->Unit={}, onItemClick:(String)->Unit={}){
+    movie: Movie, onItemClick:(String)->Unit={},content:@Composable()()->Unit={}){
     var infoIsExpanded by remember{ mutableStateOf(false) }
     Surface(){
         Card(modifier = Modifier
@@ -61,7 +60,7 @@ fun movieRow(//as function is favorited
                         ))
                 val favoritesViewModel:FavoritesViewModel = viewModel()
                 
-                Column(){
+                Column(modifier = Modifier.width(150.dp)){
                     Text(text="${movie.title}",style= MaterialTheme.typography.h6)
                     Text(text="Director: ${movie.director}",style= MaterialTheme.typography.caption)
                     Text(text="Released: ${movie.year}",style= MaterialTheme.typography.caption)
@@ -87,26 +86,22 @@ fun movieRow(//as function is favorited
 
 
                 }
-                favoriteIconButton(isFavorited =movieIsFavorited(movie) ,addToFavorite = {
-                    movieFavorited(movie)
-                },removeFromFavorite = {
-                    movieRemovedFavorites(movie)
-                })
-
+                content()
 
             }
         }
     }
 }
 @Composable
-fun favoriteIconButton(isFavorited:Boolean, addToFavorite:()->Unit={}, removeFromFavorite:()->Unit={}){
+fun favoriteIconButton(isFavorited:Boolean=false, addToFavorite:()->Unit={}, removeFromFavorite:()->Unit={}){
+
     if(!isFavorited){
         IconButton(onClick={addToFavorite()}){
-            Icon(Icons.Default.FavoriteBorder,"Favorite this movie")
+            Icon(Icons.Default.FavoriteBorder,"Favorite this movie", tint=Color.Red)
         }
     }else{
         IconButton(onClick={removeFromFavorite()}){
-            Icon(Icons.Filled.Favorite,"Remove this movie from favorites")
+            Icon(Icons.Filled.Favorite,"Remove this movie from favorites", tint=Color.Red)
         }
     }
 }

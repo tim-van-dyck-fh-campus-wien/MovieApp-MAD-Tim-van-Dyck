@@ -23,7 +23,7 @@ fun favoriteMoviesList(movieList:List<Movie>){
     LazyColumn(){
         items(movieList) {
             movie ->
-            movieRow(movie = movie,movieIsFavorited = {false})
+            movieRow(movie = movie)
         }
     }
 }
