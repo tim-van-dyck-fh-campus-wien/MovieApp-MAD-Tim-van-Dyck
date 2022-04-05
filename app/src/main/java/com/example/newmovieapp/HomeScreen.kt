@@ -1,30 +1,18 @@
 package com.example.newmovieapp
 
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.example.newmovieapp.models.Movie
 import com.example.newmovieapp.models.getMovies
 import com.example.newmovieapp.ui.theme.NewMovieAppTheme
@@ -43,9 +31,9 @@ fun dropDownMenu(isExpanded:Boolean,onDismiss:(Boolean)->Unit, favoritesClicked:
 
 }
 @Composable
-fun HomeScreen(navController: NavController){
+fun HomeScreen(navController: NavController, favoritesVM: FavoritesViewModel){
     scaffoldLayout(favoritesClicked = {navController.navigate("favoritesscreen")}) {
-        mainContent(movieList = getMovies(), navController = navController)
+        mainContent(movieList = getMovies(), navController = navController,favoritesVM = favoritesVM)
     }
 }
 
@@ -86,10 +74,10 @@ fun scaffoldLayout(favoritesClicked: () -> Unit,content:@Composable() () -> Unit
 }
 
 @Composable
-fun mainContent(movieList: List<Movie>, navController: NavController){
-
+fun mainContent(movieList: List<Movie>, navController: NavController, favoritesVM: FavoritesViewModel){
+    val movieState = remember{favoritesVM.checkIfMovieIsFavorite(movieList[0])}
     LazyColumn{
-        items(movieList) { movie -> movieRow(movie){
+        items(movieList) { movie -> movieRow(movie,movieIsFavorited = {favoritesVM.checkIfMovieIsFavorite(it)}, movieFavorited = { favoritesVM.addMovie(it)}, movieRemovedFavorites = {favoritesVM.removeMovie(it)}){
             movieId->
             navController.navigate(route="detailscreen/$movieId")
         } }
